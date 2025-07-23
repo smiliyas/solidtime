@@ -257,7 +257,6 @@ const page = usePage<{
                     </nav>
                 </div>
                 <div class="justify-self-end">
-                    <UpdateSidebarNotification></UpdateSidebarNotification>
                     <ul
                         class="border-t border-default-background-separator pt-3 flex justify-between pr-4 items-center">
                         <NavigationSidebarItem
