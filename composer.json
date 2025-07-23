@@ -1,9 +1,8 @@
 {
-    "name": "solidtime-io/solidtime",
+    "name": "hr-inodesys/timeit",
     "type": "project",
-    "description": "An open-source time-tracking app",
+    "description": "A time-tracking app",
     "keywords": [],
-    "license": "AGPL-3.0-or-later",
     "require": {
         "php": "8.3.*",
         "ext-zip": "*",

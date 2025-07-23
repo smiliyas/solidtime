@@ -23,7 +23,7 @@ return [
     |
     */
 
-    'name' => 'solidtime',
+    'name' => 'TimeIt',
 
     'version' => env('APP_VERSION'),
 
