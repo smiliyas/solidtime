@@ -1,5 +1,5 @@
 const Ziggy = {
-    'url': 'http://solidtime.test',
+    'url': 'http://timeit.test',
     'port': null,
     'defaults': {},
     'routes': {

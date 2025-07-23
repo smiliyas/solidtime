@@ -85,7 +85,7 @@ class AppServiceProvider extends ServiceProvider
                 SecurityScheme::oauth2()
                     ->flow('authorizationCode', function (OAuthFlow $flow): void {
                         $flow
-                            ->authorizationUrl('https://solidtime.test/oauth/authorize');
+                            ->authorizationUrl('https://timeit.test/oauth/authorize');
                     })
             );
         });

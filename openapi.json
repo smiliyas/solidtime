@@ -720,7 +720,7 @@
                 "type": "oauth2",
                 "flows": {
                     "authorizationCode": {
-                        "authorizationUrl": "https:\/\/solidtime.test\/oauth\/authorize"
+                        "authorizationUrl": "https:\/\/timeit.test\/oauth\/authorize"
                     }
                 }
             }
