@@ -63,8 +63,8 @@ class TimeEntryAggregationService
         $timeEntriesQuery->selectRaw(
             ($group1Select !== null ? $group1Select.' as group_1,' : '').
             ($group2Select !== null ? $group2Select.' as group_2,' : '').
-            ' round(sum(extract(epoch from ('.$endRawSelect.' - '.$startRawSelect.')))) as aggregate,'.
-            ' round(sum(extract(epoch from ('.$endRawSelect.' - '.$startRawSelect.')) * (coalesce(billable_rate, 0)::float/60/60))) as cost'
+            ' round(sum(TIMESTAMPDIFF(SECOND, '.$startRawSelect.', '.$endRawSelect.'))) as aggregate,'.
+            ' round(sum(TIMESTAMPDIFF(SECOND, '.$startRawSelect.', '.$endRawSelect.') * (CAST(coalesce(billable_rate, 0) AS DECIMAL)/60/60))) as cost'
         );
         if ($groupBy !== null) {
             $timeEntriesQuery->groupBy($groupBy);
@@ -409,21 +409,25 @@ class TimeEntryAggregationService
     {
         $timezoneShift = app(TimezoneService::class)->getShiftFromUtc(new CarbonTimeZone($timezone));
         if ($timezoneShift > 0) {
-            $dateWithTimeZone = 'start + INTERVAL \''.$timezoneShift.' second\'';
+            $dateWithTimeZone = 'start + INTERVAL '.$timezoneShift.' SECOND';
         } elseif ($timezoneShift < 0) {
-            $dateWithTimeZone = 'start - INTERVAL \''.abs($timezoneShift).' second\'';
+            $dateWithTimeZone = 'start - INTERVAL '.abs($timezoneShift).' SECOND';
         } else {
             $dateWithTimeZone = 'start';
         }
         $startOfWeek = Carbon::now()->setTimezone($timezone)->startOfWeek($startOfWeek->carbonWeekDay())->toDateTimeString();
         if ($group === TimeEntryAggregationType::Day) {
-            return 'date('.$dateWithTimeZone.')';
+            return 'DATE('.$dateWithTimeZone.')';
         } elseif ($group === TimeEntryAggregationType::Week) {
-            return "to_char(date_bin('7 days', ".$dateWithTimeZone.", timestamp '".$startOfWeek."'), 'YYYY-MM-DD')";
+            // MySQL equivalent for PostgreSQL's date_bin and to_char
+            // We use DATE_FORMAT and DATE_SUB to get the start of the week
+            return "DATE_FORMAT(DATE(DATE_SUB(".$dateWithTimeZone.", INTERVAL WEEKDAY(".$dateWithTimeZone.") DAY)), '%Y-%m-%d')";
         } elseif ($group === TimeEntryAggregationType::Month) {
-            return 'to_char('.$dateWithTimeZone.', \'YYYY-MM\')';
+            // MySQL equivalent for PostgreSQL's to_char
+            return "DATE_FORMAT(".$dateWithTimeZone.", '%Y-%m')";
         } elseif ($group === TimeEntryAggregationType::Year) {
-            return 'to_char('.$dateWithTimeZone.', \'YYYY\')';
+            // MySQL equivalent for PostgreSQL's to_char
+            return "DATE_FORMAT(".$dateWithTimeZone.", '%Y')";
         } elseif ($group === TimeEntryAggregationType::User) {
             return 'user_id';
         } elseif ($group === TimeEntryAggregationType::Project) {
@@ -437,6 +441,9 @@ class TimeEntryAggregationService
         } elseif ($group === TimeEntryAggregationType::Description) {
             return 'description';
         }
+
+        // Default return to handle any unexpected cases
+        return 'start';
     }
 
     /**

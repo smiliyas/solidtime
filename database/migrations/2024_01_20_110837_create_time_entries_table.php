@@ -44,7 +44,7 @@ return new class extends Migration
                 ->on('tasks')
                 ->cascadeOnUpdate()
                 ->restrictOnDelete();
-            $table->jsonb('tags')->nullable();
+            $table->json('tags')->nullable();
             $table->timestamps();
 
             $table->index('start');

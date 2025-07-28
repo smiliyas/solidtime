@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -16,8 +17,9 @@ return new class extends Migration
         DB::table('oauth_clients')->update(['provider' => 'users']); // Change default provider if necessary
 
         Schema::table('oauth_clients', function (Blueprint $table): void {
-            $table->text('grant_types')->default('[]')->after('provider');
-            $table->text('redirect_uris')->default('[]');
+            // For MySQL compatibility, add TEXT columns as nullable first
+            $table->text('grant_types')->nullable()->after('provider');
+            $table->text('redirect_uris')->nullable();
             $table->renameColumn('user_id', 'owner_id');
             $table->string('owner_type')->after('owner_id')->nullable();
         });
@@ -61,6 +63,12 @@ return new class extends Migration
                     'redirect_uris' => $redirectUris,
                     'grant_types' => $grantTypes,
                 ]);
+        });
+
+        // After updating all rows, make the TEXT columns NOT NULL
+        Schema::table('oauth_clients', function (Blueprint $table): void {
+            $table->text('grant_types')->nullable(false)->change();
+            $table->text('redirect_uris')->nullable(false)->change();
         });
 
         Schema::table('oauth_clients', function (Blueprint $table): void {

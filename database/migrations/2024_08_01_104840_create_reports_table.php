@@ -19,7 +19,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->boolean('is_public')->default(false)->index();
             $table->string('share_secret', 40)->nullable()->index()->unique();
-            $table->jsonb('properties');
+            $table->json('properties');
             $table->dateTime('public_until')->nullable();
             $table->uuid('organization_id');
             $table->foreign('organization_id')

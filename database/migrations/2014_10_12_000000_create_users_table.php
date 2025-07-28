@@ -35,8 +35,10 @@ return new class extends Migration
             ]);
             $table->timestamps();
 
-            $table->uniqueIndex('email')
-                ->where('is_placeholder = false');
+            // For MySQL compatibility, we use a generated column instead of a partial index
+            // This column will be null when is_placeholder is true, and equal to email when is_placeholder is false
+            $table->string('unique_email')->virtualAs('IF(is_placeholder = false, email, NULL)')->nullable();
+            $table->unique('unique_email');
         });
     }
 

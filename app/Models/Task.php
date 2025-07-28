@@ -84,7 +84,7 @@ class Task extends Model implements AuditableContract
             /** @var object{ spent_time: string } $result */
             $result = $this->timeEntries()
                 ->whereNotNull('end')
-                ->selectRaw('sum(extract(epoch from ("end" - start))) as spent_time')
+                ->selectRaw('sum(TIMESTAMPDIFF(SECOND, start, "end")) as spent_time')
                 ->first();
 
             return (int) $result->spent_time;
@@ -101,7 +101,7 @@ class Task extends Model implements AuditableContract
     public function scopeComputedAttributesGenerate(Builder $builder, array $attributes): Builder
     {
         if (in_array('spent_time', $attributes, true)) {
-            $builder->withAggregate('timeEntries as spent_time_computed', DB::raw('extract(epoch from ("end" - start))'), 'sum');
+            $builder->withAggregate('timeEntries as spent_time_computed', DB::raw('TIMESTAMPDIFF(SECOND, start, "end")'), 'sum');
         }
 
         return $builder;

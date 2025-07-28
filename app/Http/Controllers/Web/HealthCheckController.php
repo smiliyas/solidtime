@@ -43,7 +43,8 @@ class HealthCheckController extends Controller
         $secure = $request->secure();
         $isTrustedProxy = $request->isFromTrustedProxy();
 
-        $dbTimezone = DB::select('show timezone;');
+        // MySQL compatible version - get database timezone
+        $dbTimezone = DB::select('SELECT @@time_zone AS TimeZone;');
 
         $response = [
             'ip_address' => $ipAddress,

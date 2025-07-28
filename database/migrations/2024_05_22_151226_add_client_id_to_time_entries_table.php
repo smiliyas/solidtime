@@ -22,11 +22,10 @@ return new class extends Migration
                 ->cascadeOnUpdate();
         });
         DB::statement('
-            update time_entries
-            set client_id = clients.id
-            from projects
-            join clients on projects.client_id = clients.id
-            where time_entries.project_id = projects.id
+            UPDATE time_entries
+            JOIN projects ON time_entries.project_id = projects.id
+            JOIN clients ON projects.client_id = clients.id
+            SET time_entries.client_id = clients.id
         ');
     }
 

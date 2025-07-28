@@ -46,7 +46,7 @@ class SelfHostDatabaseConsistency extends Command
         $problems = DB::table('time_entries')
             ->select(['time_entries.id as id'])
             ->join('projects', 'time_entries.project_id', '=', 'projects.id')
-            ->where(DB::raw('coalesce(projects.client_id::varchar, \'\')'), '!=', DB::raw('coalesce(time_entries.client_id::varchar, \'\')'))
+            ->where(DB::raw('coalesce(CAST(projects.client_id AS CHAR), \'\')'), '!=', DB::raw('coalesce(CAST(time_entries.client_id AS CHAR), \'\')'))
             ->get();
         $this->logProblems($problems, 'Time entries have a client that does not match the client of the project', $hadAProblem);
 

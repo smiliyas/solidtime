@@ -22,11 +22,11 @@ return new class extends Migration
                 ->cascadeOnUpdate();
         });
         DB::statement('
-            update project_members
-            set member_id = organization_user.id
-            from projects
-            join organization_user on organization_user.organization_id = projects.organization_id
-            where projects.id = project_members.project_id and project_members.user_id = organization_user.user_id
+            UPDATE project_members
+            INNER JOIN projects ON projects.id = project_members.project_id
+            INNER JOIN organization_user ON organization_user.organization_id = projects.organization_id
+                AND organization_user.user_id = project_members.user_id
+            SET project_members.member_id = organization_user.id
         ');
         Schema::table('project_members', function (Blueprint $table): void {
             $table->uuid('member_id')->nullable(false)->change();
